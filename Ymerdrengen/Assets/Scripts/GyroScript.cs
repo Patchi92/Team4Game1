@@ -24,6 +24,20 @@ public class GyroScript : MonoBehaviour
     ////Threshold after which the tilt starts to account
     public float tiltThreshold;
 
+    /// <summary>
+    /// variables for the shaking
+    /// </summary>
+    float accelerometerUpdateInterval = 0.016f/*1.0 / 60.0*/;
+    // The greater the value of LowPassKernelWidthInSeconds, the slower the filtered value will converge towards current input sample (and vice versa).
+    float lowPassKernelWidthInSeconds = 1.0f;
+    // This next parameter is initialized to 2.0 per Apple's recommendation, or at least according to Brady! ;)
+    public float shakeDetectionThreshold = 2.0f;
+    private float lowPassFilterFactor;
+    private Vector3 lowPassValue = Vector3.zero;
+    private Vector3 acceleration;
+    private Vector3 deltaAcceleration;
+    bool isShaked;
+
     float xCalib;
     float zCalib;
     float timer;
@@ -51,6 +65,12 @@ public class GyroScript : MonoBehaviour
         timer = 0;
 
         isCalibrated = false;
+        isShaked = false;
+
+        ///stuff for shaking
+        lowPassFilterFactor = accelerometerUpdateInterval / lowPassKernelWidthInSeconds;
+        shakeDetectionThreshold *= shakeDetectionThreshold;
+        lowPassValue = Input.acceleration;
     }
 
     /// <summary>
@@ -78,7 +98,7 @@ public class GyroScript : MonoBehaviour
         Xdir = (movement.x - xCalib) * GravityForce;
         Zdir = (movement.z - zCalib) * GravityForce;
 
-        text.text = "x: " + Xdir + "z: " + Zdir;
+        //text.text = "x: " + Xdir + "z: " + Zdir;
 
 
         if (Mathf.Abs(Xdir) < tiltThreshold)
@@ -88,5 +108,17 @@ public class GyroScript : MonoBehaviour
 
         if(isCalibrated)
             ball.GetComponent<Rigidbody>().AddForce(new Vector3(Xdir,0,Zdir) * Time.deltaTime);
+
+        /// stuff for shaking
+        acceleration = Input.acceleration;
+        lowPassValue = Vector3.Lerp(lowPassValue, acceleration, lowPassFilterFactor);
+        deltaAcceleration = acceleration - lowPassValue;
+        if (deltaAcceleration.sqrMagnitude >= shakeDetectionThreshold)
+        {
+            // Perform your "shaking actions" here, with suitable guards in the if check above, if necessary to not, to not fire again if they're already being performed.
+            isShaked = true;
+            text.text = "shaked!";
+            //Debug.Log("Shake event detected at time " + Time.time);
+        }
     }
 }
