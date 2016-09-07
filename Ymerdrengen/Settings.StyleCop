@@ -10,6 +10,17 @@
       </Rules>
       <AnalyzerSettings />
     </Analyzer>
+<<<<<<< HEAD
+    <Analyzer AnalyzerId="StyleCop.CSharp.ReadabilityRules">
+      <Rules>
+        <Rule Name="PrefixCallsCorrectly">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
+      </Rules>
+      <AnalyzerSettings />
+=======
     <Analyzer AnalyzerId="StyleCop.CSharp.NamingRules">
       <AnalyzerSettings>
         <CollectionProperty Name="Hungarian">
@@ -17,6 +28,7 @@
           <Value>z</Value>
         </CollectionProperty>
       </AnalyzerSettings>
+>>>>>>> 97dc08229827163f72a254bd71875976a72e125a
     </Analyzer>
   </Analyzers>
 </StyleCopSettings>
